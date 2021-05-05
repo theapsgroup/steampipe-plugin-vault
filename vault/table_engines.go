@@ -3,68 +3,70 @@ package vault
 import (
 	"context"
 
-	vault "github.com/hashicorp/vault/api"
 	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 )
+
+type Engine struct {
+	Path string
+	Type string
+}
 
 func tableEngines() *plugin.Table {
 	return &plugin.Table{
 		Name:        "vault_engines",
 		Description: "Vault secrets engines",
 		List: &plugin.ListConfig{
-			Hydrate: listUser,
+			Hydrate: listEngines,
 		},
 		Get: &plugin.GetConfig{
-			KeyColumns: plugin.SingleColumn("id"),
-			Hydrate:    getUser,
+			KeyColumns: plugin.SingleColumn("path"),
+			Hydrate:    getEngine,
 		},
 		Columns: []*plugin.Column{
-			{Name: "name", Type: proto.ColumnType_STRING, Description: "The name of the secrets engine"},
+			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path of the secrets engine"},
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of the secrets engine"},
 		},
 	}
 }
 
-func listUser(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	var vaultClient *vault.Client
-	conn, err := connect(ctx)
+func listEngines(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	conn, err := connect(ctx, d)
+
 	if err != nil {
 		return nil, err
 	}
-	opts := &zendesk.UserListOptions{
-		PageOptions: zendesk.PageOptions{
-			Page:    1,
-			PerPage: 100,
-		},
+
+	data, err := conn.Sys().ListMounts()
+	for path, _ := range data {
+		d.StreamListItem(ctx, &Engine{Type: data[path].Type, Path: path})
+
 	}
-	for true {
-		users, page, err := conn.GetUsers(ctx, opts)
-		if err != nil {
-			return nil, err
-		}
-		for _, t := range users {
-			d.StreamListItem(ctx, t)
-		}
-		if !page.HasNext() {
-			break
-		}
-		opts.Page++
-	}
+
 	return nil, nil
 }
-func getUser(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
-	conn, err := connect(ctx)
+
+func getEngine(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	conn, err := connect(ctx, d)
+
 	if err != nil {
 		return nil, err
 	}
+
+	data, err := conn.Sys().ListMounts()
+
+	if err != nil {
+		return nil, err
+	}
+
 	quals := d.KeyColumnQuals
-	plugin.Logger(ctx).Warn("getUser", "quals", quals)
-	id := quals["id"].GetInt64Value()
-	plugin.Logger(ctx).Warn("getUser", "id", id)
-	result, err := conn.GetUser(ctx, id)
-	if err != nil {
-		return nil, err
+	path := quals["path"].GetStringValue()
+
+	result := data[path]
+	if result == nil {
+		// TODO: figure out if this is expected to be error
+		return nil, nil
 	}
-	return result, nil
+
+	return &Engine{Type: data[path].Type, Path: path}, nil
 }

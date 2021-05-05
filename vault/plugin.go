@@ -2,6 +2,7 @@ package vault
 
 import (
 	"context"
+
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
@@ -18,4 +19,6 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"vault_engines": tableEngines(),
 		},
 	}
+
+	return p
 }

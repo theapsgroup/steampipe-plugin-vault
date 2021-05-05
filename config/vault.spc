@@ -1,3 +1,3 @@
 connection "vault" {
-  plugin = "vault"
+  plugin = "vault/steampipe-plugin-vault"
 }
