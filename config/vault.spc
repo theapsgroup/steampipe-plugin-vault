@@ -1,0 +1,3 @@
+connection "vault" {
+  plugin = "vault"
+}
