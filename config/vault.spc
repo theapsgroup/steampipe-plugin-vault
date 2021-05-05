@@ -1,3 +1,3 @@
 connection "vault" {
-  plugin = "vault/vault"
+  plugin = "theapsgroup/vault"
 }
