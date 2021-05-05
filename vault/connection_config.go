@@ -6,8 +6,8 @@ import (
 )
 
 type vaultConfig struct {
-	Address *string `cty:address`
-	Token   *string `cty:token`
+	Address *string `cty:"address"`
+	Token   *string `cty:"token"`
 }
 
 var ConfigSchema = map[string]*schema.Attribute{
