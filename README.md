@@ -15,7 +15,7 @@ Build & Installation from Source:
 ```shell
 go build -o steampipe-plugin-vault.plugin
 
-mv steampipe-plugin-vault.plugin ~/.steampipe/plugins/hub.steampipe.io/plugins/theapsgroup/vault@lateststeampipe-plugin-vault.plugin
+mv steampipe-plugin-vault.plugin ~/.steampipe/plugins/hub.steampipe.io/plugins/theapsgroup/vault@latest/steampipe-plugin-vault.plugin
 
 cp config/vault.spc ~/.steampipe/config/vault.spc
 ```
