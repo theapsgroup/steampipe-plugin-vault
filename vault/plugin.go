@@ -16,7 +16,8 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 		},
 		DefaultTransform: transform.FromGo().NullIfZero(),
 		TableMap: map[string]*plugin.Table{
-			"vault_engines": tableEngines(),
+			"vault_engines":    tableEngines(),
+			"vault_kv_secrets": tableKvSecrets(),
 		},
 	}
 
