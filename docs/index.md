@@ -25,7 +25,7 @@ cp config/vault.spc ~/.steampipe/config/vault.spc
 
 ### Configuration
 
-The preferred option is to use Environment Variables for configuration as the Vault Token should be rotated frequently, however you can configure in the `~./steampipe/config/vault.spc` (this will taken precedence).
+The preferred option is to use Environment Variables for configuration as the Vault Token should be rotated frequently, however you can configure in the `~./steampipe/config/vault.spc` (this will take precedence).
 
 Environment Variables (default from Hashicorp Vault):
 
