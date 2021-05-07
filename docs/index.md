@@ -53,5 +53,6 @@ steampipe query "select * from vault_engines"
 
 The following tables are available for querying, follow the links for more information.
 
+- [vault_sys_health](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_sys_health.md)
 - [vault_engines](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engines.md)
 - [vault_kv_secrets](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_kv_secrets.md)
