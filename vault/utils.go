@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/vault/api"
@@ -46,4 +47,9 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 	client.SetToken(tkn)
 
 	return client, nil
+}
+
+// Util func to replace any double / with single ones, used to make concatting paths easier
+func replaceDoubleSlash(url string) string {
+	return strings.ReplaceAll(url, "//", "/")
 }
