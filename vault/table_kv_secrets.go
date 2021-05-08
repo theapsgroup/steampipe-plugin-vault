@@ -37,11 +37,6 @@ func tableKvSecrets() *plugin.Table {
 	}
 }
 
-// Util func to replace any double / with single ones, used to make concatting paths easier
-func replaceDoubleSlash(p string) string {
-	return strings.ReplaceAll(p, "//", "/")
-}
-
 // Converts and api.Secret object into a slice of strings containing all secret paths
 func getSecretAsStrings(ctx context.Context, s *api.Secret) []string {
 	if s == nil || s.Data["keys"] == nil || len(s.Data["keys"].([]interface{})) == 0 {

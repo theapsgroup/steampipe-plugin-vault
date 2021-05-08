@@ -19,6 +19,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"vault_engines":    tableEngines(),
 			"vault_kv_secrets": tableKvSecrets(),
 			"vault_sys_health": tableSysHealth(),
+			"vault_aws_roles":  tableAwsRoles(),
 		},
 	}
 
