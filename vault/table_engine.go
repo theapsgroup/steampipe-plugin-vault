@@ -12,9 +12,9 @@ type Engine struct {
 	Type       string
 }
 
-func tableEngines() *plugin.Table {
+func tableEngine() *plugin.Table {
 	return &plugin.Table{
-		Name:        "vault_engines",
+		Name:        "vault_engine",
 		Description: "Vault secrets engines",
 		List: &plugin.ListConfig{
 			Hydrate: listEngines,

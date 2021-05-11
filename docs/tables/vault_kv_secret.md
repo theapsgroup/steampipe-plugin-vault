@@ -1,4 +1,4 @@
-# Table: vault_kv_secrets
+# Table: vault_kv_secret
 
 For working with paths for secrets in the kv [engines](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engines.md)
 
@@ -20,7 +20,7 @@ select
   path,
   mountpoint
 from
-  vault_kv_secrets;
+  vault_kv_secret;
 ```
 
 ### Get all secret paths from a specific mounted kv engine (`abc/` in this example)
@@ -29,7 +29,7 @@ from
 select
   path
 from
-  vault_kv_secrets
+  vault_kv_secret
 where
   mountpoint = 'abc/';
 ```
@@ -40,7 +40,7 @@ where
 select
   *
 from
-  vault_kv_secrets
+  vault_kv_secret
 where
   path like '%myapp%';
 ```

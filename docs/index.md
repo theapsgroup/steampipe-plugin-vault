@@ -46,7 +46,7 @@ connection "vault" {
 A quick test can be performed from your terminal with:
 
 ```shell
-steampipe query "select * from vault_engines"
+steampipe query "select * from vault_engine"
 ```
 
 ## Tables
@@ -54,6 +54,6 @@ steampipe query "select * from vault_engines"
 The following tables are available for querying, follow the links for more information.
 
 - [vault_sys_health](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_sys_health.md)
-- [vault_engines](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engines.md)
-- [vault_kv_secrets](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_kv_secrets.md)
-- [vault_aws_roles](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_aws_roles.md)
+- [vault_engine](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engine.md)
+- [vault_kv_secret](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_kv_secret.md)
+- [vault_aws_role](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_aws_role.md)

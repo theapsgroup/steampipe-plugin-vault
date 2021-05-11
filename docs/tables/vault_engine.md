@@ -1,4 +1,4 @@
-# Table: vault_engines
+# Table: vault_engine
 
 Vault Secrets Engines currently mounted.
 
@@ -17,7 +17,7 @@ Vault Secrets Engines currently mounted.
 select
   *
 from
-  vault_engines;
+  vault_engine;
 ```
 
 ### Get mounted engines of the Key Value type
@@ -26,7 +26,7 @@ from
 select
   *
 from
-  vault_engines
+  vault_engine
 where
   type = 'kv';
 ```
@@ -38,7 +38,7 @@ select
   type,
   count(*)
 from
-  vault_engines
+  vault_engine
 group by
   type;
 ```

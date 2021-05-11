@@ -19,9 +19,9 @@ type KvSecret struct {
 }
 
 // Defines the table structure and functions to get vault kv secret data
-func tableKvSecrets() *plugin.Table {
+func tableKvSecret() *plugin.Table {
 	return &plugin.Table{
-		Name:        "vault_kv_secrets",
+		Name:        "vault_kv_secret",
 		Description: "Vault kv secret keys",
 		List: &plugin.ListConfig{
 			Hydrate: listSecrets,

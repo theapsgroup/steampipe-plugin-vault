@@ -19,9 +19,9 @@ type SecretData struct {
 	Keys []string `json:"keys"`
 }
 
-func tableAwsRoles() *plugin.Table {
+func tableAwsRole() *plugin.Table {
 	return &plugin.Table{
-		Name:        "vault_aws_roles",
+		Name:        "vault_aws_role",
 		Description: "Vault AWS Roles",
 		List: &plugin.ListConfig{
 			Hydrate: listRoles,
