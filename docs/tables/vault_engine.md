@@ -6,7 +6,7 @@ Vault Secrets Engines currently mounted.
 
 | Column | Description |
 | - | - |
-| mountpoint | The path at which an engine is mounted - for example `apples/` |
+| path | The path at which an engine is mounted - for example `apples/` |
 | type | The type of engine used by the mountpoint, such as `kv`, `aws`, etc |
 
 ## Examples
@@ -20,11 +20,11 @@ from
   vault_engine;
 ```
 
-### Get mounted engines of the Key Value type
+### Get the path mounted engines of the Key Value type
 
 ```sql
 select
-  *
+  path
 from
   vault_engine
 where

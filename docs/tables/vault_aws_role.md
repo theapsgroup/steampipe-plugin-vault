@@ -6,7 +6,7 @@ AWS Roles contained within Vault Mountpoints.
 
 | Column | Description |
 | - | - |
-| mountpoint | The path at which an engine is mounted - for example `aws/` |
+| path | The path at which an engine is mounted - for example `aws/` |
 | role | The aws role name - for example `prod-deploy` |
 
 ## Examples

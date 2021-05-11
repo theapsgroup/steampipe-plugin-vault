@@ -14,8 +14,8 @@ import (
 // Path is the path within the mountpoint.
 // Mountpoint is the name of the engine
 type KvSecret struct {
-	Path       string
-	Mountpoint string
+	Key  string
+	Path string
 }
 
 // Defines the table structure and functions to get vault kv secret data
@@ -27,12 +27,12 @@ func tableKvSecret() *plugin.Table {
 			Hydrate: listSecrets,
 		},
 		Get: &plugin.GetConfig{
-			KeyColumns: plugin.AllColumns([]string{"path", "mountpoint"}),
+			KeyColumns: plugin.AllColumns([]string{"key", "mountpoint"}),
 			Hydrate:    getSecret,
 		},
 		Columns: []*plugin.Column{
-			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path of the kv secret"},
-			{Name: "mountpoint", Type: proto.ColumnType_STRING, Description: "The mountpoint of the engine"},
+			{Name: "key", Type: proto.ColumnType_STRING, Description: "The key/path of the kv secret"},
+			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path (mount point) of the secrets engine"},
 		},
 	}
 }
@@ -52,11 +52,11 @@ func getSecretAsStrings(ctx context.Context, s *api.Secret) []string {
 
 // Lists all secrets in a secret engine, this has to be done recursively because you only get everything in a "folder"
 // Folders are identified by a trailing slash. Non trailing slash entries are individual secrets
-func listKvSecrets(ctx context.Context, client *api.Client, engine string, path string) ([]string, error) {
+func listKvSecrets(ctx context.Context, client *api.Client, engine string, keyPath string) ([]string, error) {
 	var secrets []string
-	data, err := client.Logical().List(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, path)))
+	data, err := client.Logical().List(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, keyPath)))
 	for _, k := range getSecretAsStrings(ctx, data) {
-		fullPath := replaceDoubleSlash(fmt.Sprintf("%s/%s", path, k))
+		fullPath := replaceDoubleSlash(fmt.Sprintf("%s/%s", keyPath, k))
 		if strings.HasSuffix(k, "/") {
 			nestedSecrets, _ := listKvSecrets(ctx, client, engine, fullPath)
 			secrets = append(secrets, nestedSecrets...)
@@ -70,8 +70,8 @@ func listKvSecrets(ctx context.Context, client *api.Client, engine string, path 
 
 // Checks whether a secret exists, used for the get single secret call
 // Returns a bool to make sure we don't leak the values of a secret
-func secretExists(ctx context.Context, client *api.Client, engine string, path string) (bool, error) {
-	data, err := client.Logical().Read(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, path)))
+func secretExists(ctx context.Context, client *api.Client, engine string, keyPath string) (bool, error) {
+	data, err := client.Logical().Read(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, keyPath)))
 	return data != nil, err
 }
 
@@ -87,7 +87,7 @@ func listSecrets(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 		if mounts[path].Type == "kv" {
 			secrets, _ := listKvSecrets(ctx, conn, path, "")
 			for _, k := range secrets {
-				d.StreamListItem(ctx, &KvSecret{Mountpoint: path, Path: k})
+				d.StreamListItem(ctx, &KvSecret{Path: path, Key: k})
 			}
 		}
 	}
@@ -104,16 +104,16 @@ func getSecret(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 	}
 
 	quals := d.KeyColumnQuals
-	path := quals["path"].GetStringValue()
-	mountpoint := quals["mountpoint"].GetStringValue()
+	keyPath := quals["key"].GetStringValue()
+	mountpoint := quals["path"].GetStringValue()
 
-	data, err := secretExists(ctx, conn, mountpoint, path)
+	data, err := secretExists(ctx, conn, mountpoint, keyPath)
 
 	if err != nil {
 		return nil, err
 	}
 	if data {
-		return &KvSecret{Mountpoint: mountpoint, Path: path}, nil
+		return &KvSecret{Path: mountpoint, Key: keyPath}, nil
 	}
 
 	return nil, nil

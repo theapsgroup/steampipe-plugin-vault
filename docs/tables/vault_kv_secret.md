@@ -8,30 +8,30 @@ For working with paths for secrets in the kv [engines](https://github.com/theaps
 
 | Column | Description |
 | - | - |
-| path | The path of the secret within the kv engine |
-| mountpoint | The path at which an engine is mounted - for example `apples/` |
+| key | The key of the secret within the kv engine |
+| path | The path at which an engine is mounted - for example `apples/` |
 
 ## Examples
 
-### Get all secret paths from all kv engines
+### Get all secret keys from all kv engines
 
 ```sql
 select
-  path,
-  mountpoint
+  key,
+  path
 from
   vault_kv_secret;
 ```
 
-### Get all secret paths from a specific mounted kv engine (`abc/` in this example)
+### Get all secret keys from a specific mounted kv engine (`abc/` in this example)
 
 ```sql
 select
-  path
+  key
 from
   vault_kv_secret
 where
-  mountpoint = 'abc/';
+  path = 'abc/';
 ```
 
 ### Search for secret paths based on a fragment/keyword
@@ -42,5 +42,5 @@ select
 from
   vault_kv_secret
 where
-  path like '%myapp%';
+  key like '%myapp%';
 ```
