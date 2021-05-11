@@ -11,8 +11,8 @@ import (
 )
 
 // The structure of a KV secret.
-// Path is the path within the mountpoint.
-// Mountpoint is the name of the engine
+// Key is the path within the mountpoint.
+// Path is the name of the engine
 type KvSecret struct {
 	Key  string
 	Path string

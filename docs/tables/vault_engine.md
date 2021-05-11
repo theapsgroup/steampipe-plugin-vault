@@ -20,7 +20,7 @@ from
   vault_engine;
 ```
 
-### Get the path mounted engines of the Key Value type
+### Get the path of mounted engines which are of the Key Value (KV) type
 
 ```sql
 select
