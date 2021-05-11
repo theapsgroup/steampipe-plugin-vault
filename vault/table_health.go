@@ -24,10 +24,6 @@ func tableSysHealth() *plugin.Table {
 	return &plugin.Table{
 		Name:        "vault_sys_health",
 		Description: "Health of Vault",
-		Get: &plugin.GetConfig{
-			KeyColumns: plugin.SingleColumn("cluster_id"),
-			Hydrate:    noop,
-		},
 		List: &plugin.ListConfig{
 			Hydrate: getSysHealth,
 		},
@@ -72,9 +68,5 @@ func getSysHealth(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDat
 		ClusterID:                  data.ClusterID,
 	})
 
-	return nil, nil
-}
-
-func noop(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	return nil, nil
 }
