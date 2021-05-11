@@ -1,3 +1,15 @@
+---
+organization: The APS Group
+category: ["security"]
+icon_url: "/images/plugins/turbot/vault.svg"
+brand_color: "#000000"
+display_name: "Hashicorp Vault"
+short_name: "vault"
+description: "Steampipe plugin for querying ___ from Hashicorp Vault."
+og_description: Query Hashicorp Vault with SQL! Open source CLI. No DB required. 
+og_image: "/images/plugins/turbot/vault-social-graphic.png"
+---
+
 # Hashicorp Vault + Turbot Steampipe
 
 [Vault](https://www.vaultproject.io/) is an industry-leading Secrets Management & Data Protection solution from [Hashicorp](https://www.hashicorp.com/).
