@@ -10,6 +10,10 @@ For working with paths for secrets in the kv [engines](https://github.com/theaps
 | - | - |
 | key | The key of the secret within the kv engine |
 | path | The path at which an engine is mounted - for example `apples/` |
+| created_time | The date and time the secret was created - for example `2020-11-06 11:12:54` |
+| deletion_time | The date and time the secret was destroyed - for example `2021-01-06 12:14:56` |
+| destroyed | Whether the secret was destroyed - for example `false` |
+| version | The current version of the secret - for example `4` |
 
 ## Examples
 
