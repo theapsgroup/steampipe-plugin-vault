@@ -5,12 +5,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/hashicorp/vault/api"
 	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 )
+
+type SecretPath struct {
+	Engine string
+	Path   string
+}
 
 // The structure of a KV secret.
 // Key is the path within the mountpoint.
@@ -92,39 +98,81 @@ func getSecretMetadata(ctx context.Context, client *api.Client, engine string, k
 }
 
 // Lists all secrets in a secret engine, this has to be done recursively because you only get everything in a "folder"
-// Folders are identified by a trailing slash. Non trailing slash entries are individual secrets
-func listKvSecrets(ctx context.Context, client *api.Client, engine string, keyPath string) ([]string, error) {
+func listPathSecrets(ctx context.Context, client *api.Client, engine string, keyPath string) ([]string, error) {
 	var secrets []string
 	data, err := client.Logical().List(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, keyPath)))
 	for _, k := range getSecretAsStrings(ctx, data) {
 		fullPath := replaceDoubleSlash(fmt.Sprintf("%s/%s", keyPath, k))
-		if strings.HasSuffix(k, "/") {
-			nestedSecrets, _ := listKvSecrets(ctx, client, engine, fullPath)
-			secrets = append(secrets, nestedSecrets...)
-
-		} else {
-			secrets = append(secrets, fullPath)
-		}
+		secrets = append(secrets, fullPath)
 	}
 	return secrets, err
 }
 
+// Worker to receive paths to explore. Folders are explored recursively
+// Folders are identified by a trailing slash. Non trailing slash entries are individual secrets
+// foldersChan is the channel that will be used to receive paths to still explore from. This is fed by this function as well as the listSecrets one
+// secretsChan is the channel that will be used to output received secret metadata, which is the data we're actually interested in
+func listKvSecrets(ctx context.Context, client *api.Client, foldersChan chan SecretPath, secretsChan chan *KvSecret, wg *sync.WaitGroup) {
+	for k := range foldersChan {
+		if strings.HasSuffix(k.Path, "/") {
+			pathSecrets, _ := listPathSecrets(ctx, client, k.Engine, k.Path)
+
+			// We use the waitgroup as a counter. Once we've had as many wg.Done() calls as wg.Add, we've processed all trees
+			wg.Add(len(pathSecrets))
+			for _, p := range pathSecrets {
+				foldersChan <- SecretPath{Engine: k.Engine, Path: p}
+			}
+		} else {
+			secret, err := getSecretMetadata(ctx, client, k.Engine, k.Path)
+			if err == nil {
+				secretsChan <- secret
+			}
+		}
+		wg.Done()
+	}
+}
+
 // The function called by steampipe to populate the table. Will recursively fetch all secrets
 func listSecrets(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	// used to determine when we've explored all paths
+	var wg sync.WaitGroup
+
+	// Fairly large buffers. Because foldersChan is self feeding with recursive paths, it could deadlock if there isn't
+	// enough space to actually contain the paths left to explore
+	foldersChan := make(chan SecretPath, 50000)
+	secretsChan := make(chan *KvSecret, 50000)
+
 	conn, err := connect(ctx, d)
 	if err != nil {
 		return nil, err
 	}
 
+	// Queue up the mounts to explore
 	mounts, err := conn.Sys().ListMounts()
 	for path := range mounts {
 		if mounts[path].Type == "kv" {
-			secrets, _ := listKvSecrets(ctx, conn, path, "")
-			for _, k := range secrets {
-				secret, _ := getSecretMetadata(ctx, conn, path, k)
-				d.StreamListItem(ctx, secret)
-			}
+			foldersChan <- SecretPath{Engine: path, Path: "/"}
+			wg.Add(1)
 		}
+	}
+
+	// Workers for parallel requests
+	go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
+	go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
+	go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
+	go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
+
+	// Wait for the waitgroup to be done, once the waitgroup is done we'll have explored all paths and can close the channels
+	// This makes the goroutines and stream loop below terminate
+	go func() {
+		wg.Wait()
+		close(foldersChan)
+		close(secretsChan)
+	}()
+
+	// Stream any items to steampipe that we've received so far
+	for s := range secretsChan {
+		d.StreamListItem(ctx, s)
 	}
 
 	return nil, nil
