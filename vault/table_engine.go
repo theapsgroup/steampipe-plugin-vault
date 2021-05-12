@@ -8,23 +8,23 @@ import (
 )
 
 type Engine struct {
-	Mountpoint string
-	Type       string
+	Path string
+	Type string
 }
 
-func tableEngines() *plugin.Table {
+func tableEngine() *plugin.Table {
 	return &plugin.Table{
-		Name:        "vault_engines",
+		Name:        "vault_engine",
 		Description: "Vault secrets engines",
 		List: &plugin.ListConfig{
 			Hydrate: listEngines,
 		},
 		Get: &plugin.GetConfig{
-			KeyColumns: plugin.SingleColumn("mountpoint"),
+			KeyColumns: plugin.SingleColumn("path"),
 			Hydrate:    getEngine,
 		},
 		Columns: []*plugin.Column{
-			{Name: "mountpoint", Type: proto.ColumnType_STRING, Description: "The mount point of the secrets engine"},
+			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path (mount point) of the secrets engine"},
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of the secrets engine"},
 		},
 	}
@@ -39,7 +39,7 @@ func listEngines(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 
 	data, err := conn.Sys().ListMounts()
 	for path := range data {
-		d.StreamListItem(ctx, &Engine{Type: data[path].Type, Mountpoint: path})
+		d.StreamListItem(ctx, &Engine{Type: data[path].Type, Path: path})
 
 	}
 
@@ -68,5 +68,5 @@ func getEngine(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		return nil, nil
 	}
 
-	return &Engine{Type: data[path].Type, Mountpoint: path}, nil
+	return &Engine{Type: data[path].Type, Path: path}, nil
 }

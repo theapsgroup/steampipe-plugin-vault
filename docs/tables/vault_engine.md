@@ -1,4 +1,4 @@
-# Table: vault_engines
+# Table: vault_engine
 
 Vault Secrets Engines currently mounted.
 
@@ -6,7 +6,7 @@ Vault Secrets Engines currently mounted.
 
 | Column | Description |
 | - | - |
-| mountpoint | The path at which an engine is mounted - for example `apples/` |
+| path | The path at which an engine is mounted - for example `apples/` |
 | type | The type of engine used by the mountpoint, such as `kv`, `aws`, etc |
 
 ## Examples
@@ -17,16 +17,16 @@ Vault Secrets Engines currently mounted.
 select
   *
 from
-  vault_engines;
+  vault_engine;
 ```
 
-### Get mounted engines of the Key Value type
+### Get the path of mounted engines which are of the Key Value (KV) type
 
 ```sql
 select
-  *
+  path
 from
-  vault_engines
+  vault_engine
 where
   type = 'kv';
 ```
@@ -38,7 +38,7 @@ select
   type,
   count(*)
 from
-  vault_engines
+  vault_engine
 group by
   type;
 ```

@@ -1,3 +1,15 @@
+---
+organization: The APS Group
+category: ["security"]
+icon_url: "/images/plugins/turbot/vault.svg"
+brand_color: "#000000"
+display_name: "Hashicorp Vault"
+short_name: "vault"
+description: "Steampipe plugin for querying availabe secret keys (not values), etc from Hashicorp Vault."
+og_description: Query Hashicorp Vault with SQL! Open source CLI. No DB required. 
+og_image: "/images/plugins/turbot/vault-social-graphic.png"
+---
+
 # Hashicorp Vault + Turbot Steampipe
 
 [Vault](https://www.vaultproject.io/) is an industry-leading Secrets Management & Data Protection solution from [Hashicorp](https://www.hashicorp.com/).
@@ -46,7 +58,7 @@ connection "vault" {
 A quick test can be performed from your terminal with:
 
 ```shell
-steampipe query "select * from vault_engines"
+steampipe query "select * from vault_engine"
 ```
 
 ## Tables
@@ -54,6 +66,6 @@ steampipe query "select * from vault_engines"
 The following tables are available for querying, follow the links for more information.
 
 - [vault_sys_health](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_sys_health.md)
-- [vault_engines](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engines.md)
-- [vault_kv_secrets](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_kv_secrets.md)
-- [vault_aws_roles](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_aws_roles.md)
+- [vault_engine](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engine.md)
+- [vault_kv_secret](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_kv_secret.md)
+- [vault_aws_role](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_aws_role.md)

@@ -11,27 +11,27 @@ import (
 )
 
 type AwsRole struct {
-	Mountpoint string
-	Role       string
+	Path string
+	Role string
 }
 
 type SecretData struct {
 	Keys []string `json:"keys"`
 }
 
-func tableAwsRoles() *plugin.Table {
+func tableAwsRole() *plugin.Table {
 	return &plugin.Table{
-		Name:        "vault_aws_roles",
+		Name:        "vault_aws_role",
 		Description: "Vault AWS Roles",
 		List: &plugin.ListConfig{
 			Hydrate: listRoles,
 		},
 		Get: &plugin.GetConfig{
-			KeyColumns: plugin.AllColumns([]string{"mountpoint", "role"}),
+			KeyColumns: plugin.AllColumns([]string{"path", "role"}),
 			Hydrate:    getRole,
 		},
 		Columns: []*plugin.Column{
-			{Name: "mountpoint", Type: proto.ColumnType_STRING, Description: "The mountpoint of the AWS Roles"},
+			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path (mount point) of the engine containing AWS Roles"},
 			{Name: "role", Type: proto.ColumnType_STRING, Description: "The AWS Role"},
 		},
 	}
@@ -56,7 +56,7 @@ func listRoles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		}
 
 		for _, role := range roles.Keys {
-			d.StreamListItem(ctx, &AwsRole{Mountpoint: mount, Role: role})
+			d.StreamListItem(ctx, &AwsRole{Path: mount, Role: role})
 		}
 	}
 
@@ -71,7 +71,7 @@ func getRole(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (i
 	}
 
 	quals := d.KeyColumnQuals
-	mountpoint := quals["mountpoint"].GetStringValue()
+	mountpoint := quals["path"].GetStringValue()
 	role := quals["role"].GetStringValue()
 
 	data, err := roleExists(conn, mountpoint, role)
@@ -79,7 +79,7 @@ func getRole(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (i
 		return nil, err
 	}
 	if data {
-		return &AwsRole{Mountpoint: mountpoint, Role: role}, nil
+		return &AwsRole{Path: mountpoint, Role: role}, nil
 	}
 
 	return nil, nil

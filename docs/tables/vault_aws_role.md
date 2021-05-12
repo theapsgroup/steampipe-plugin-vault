@@ -1,4 +1,4 @@
-# Table: vault_aws_roles
+# Table: vault_aws_role
 
 AWS Roles contained within Vault Mountpoints.
 
@@ -6,7 +6,7 @@ AWS Roles contained within Vault Mountpoints.
 
 | Column | Description |
 | - | - |
-| mountpoint | The path at which an engine is mounted - for example `aws/` |
+| path | The path at which an engine is mounted - for example `aws/` |
 | role | The aws role name - for example `prod-deploy` |
 
 ## Examples
@@ -17,7 +17,7 @@ AWS Roles contained within Vault Mountpoints.
 select
   *
 from
-  vault_aws_roles
+  vault_aws_role
 ```
 
 ### Roles matching a specific pattern - in example containing `deploy`
@@ -26,7 +26,7 @@ from
 select
   *
 from
-  vault_aws_roles
+  vault_aws_role
 where
   role like '%deploy%'
 ```

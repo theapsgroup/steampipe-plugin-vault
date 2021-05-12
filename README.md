@@ -5,7 +5,7 @@
 Use SQL to query Vault. Example:
 
 ```sql
-select * from vault_engines
+select * from vault_engine
 ```
 
 ## Get Started

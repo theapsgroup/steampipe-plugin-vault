@@ -16,10 +16,10 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 		},
 		DefaultTransform: transform.FromGo().NullIfZero(),
 		TableMap: map[string]*plugin.Table{
-			"vault_engines":    tableEngines(),
-			"vault_kv_secrets": tableKvSecrets(),
+			"vault_engine":     tableEngine(),
+			"vault_kv_secret":  tableKvSecret(),
 			"vault_sys_health": tableSysHealth(),
-			"vault_aws_roles":  tableAwsRoles(),
+			"vault_aws_role":   tableAwsRole(),
 		},
 	}
 
