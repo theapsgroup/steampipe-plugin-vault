@@ -14,7 +14,7 @@ Allows for displaying system health information.
 | performance_standby | Is Performance Standby (bool) |
 | replication_performance_mode | Replication Performance Mode (example: `disabled`) |
 | replication_dr_mode | Replication Disaster Recovery Mode (example: `disabled`) |
-| server_time_utc | Current Server Time (UTC) - Specified in epoch/timestamp format |
+| server_time_utc | Current Server Time (UTC) |
 | version | Vault Server Version |
 | cluster_name | Vault Cluster Name |
 | cluster_id | Vault Cluster Identifier |
