@@ -5,6 +5,7 @@ import (
 
 	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
 type SysHealth struct {
@@ -34,7 +35,7 @@ func tableSysHealth() *plugin.Table {
 			{Name: "performance_standby", Type: proto.ColumnType_BOOL, Description: "Is Performance Standby"},
 			{Name: "replication_performance_mode", Type: proto.ColumnType_STRING, Description: "Replication Performance Mode"},
 			{Name: "replication_dr_mode", Type: proto.ColumnType_STRING, Description: "Replication Disaster Recovery Mode"},
-			{Name: "server_time_utc", Type: proto.ColumnType_INT, Description: "Server Time in UTC (epoch/timestamp)"},
+			{Name: "server_time_utc", Type: proto.ColumnType_TIMESTAMP, Description: "Server Time in UTC", Transform: transform.FromField("ServerTimeUtc").Transform(convertTimestamp)},
 			{Name: "version", Type: proto.ColumnType_STRING, Description: "Hashicorp Vault Version"},
 			{Name: "cluster_name", Type: proto.ColumnType_STRING, Description: "Name of Vault Cluster"},
 			{Name: "cluster_id", Type: proto.ColumnType_STRING, Description: "Identity of Vault Cluster"},
