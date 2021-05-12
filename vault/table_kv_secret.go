@@ -39,10 +39,10 @@ func tableKvSecret() *plugin.Table {
 		Columns: []*plugin.Column{
 			{Name: "key", Type: proto.ColumnType_STRING, Description: "The key/path of the kv secret"},
 			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path (mount point) of the secrets engine"},
-			{Name: "created_time", Type: proto.ColumnType_TIMESTAMP, Description: "The path (mount point) of the secrets engine"},
-			{Name: "deletion_time", Type: proto.ColumnType_TIMESTAMP, Description: "The path (mount point) of the secrets engine"},
-			{Name: "destroyed", Type: proto.ColumnType_BOOL, Description: "The path (mount point) of the secrets engine"},
-			{Name: "version", Type: proto.ColumnType_INT, Description: "The path (mount point) of the secrets engine"},
+			{Name: "created_time", Type: proto.ColumnType_TIMESTAMP, Description: "The date and time the secret was created"},
+			{Name: "deletion_time", Type: proto.ColumnType_TIMESTAMP, Description: "The date and time the secret was destroyed, if destroyed"},
+			{Name: "destroyed", Type: proto.ColumnType_BOOL, Description: "Whether the secret was destroyed"},
+			{Name: "version", Type: proto.ColumnType_INT, Description: "The current version of the secret"},
 		},
 	}
 }
