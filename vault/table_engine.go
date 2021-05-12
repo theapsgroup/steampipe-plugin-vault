@@ -2,14 +2,22 @@ package vault
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 )
 
 type Engine struct {
-	Path string
-	Type string
+	Path        string
+	Type        string
+	Description string
+	Accessor    string
+	Version     int64
+	Local       bool
+	SealWrap    bool
+	DefaultTtl  int
+	MaxTtl      int
 }
 
 func tableEngine() *plugin.Table {
@@ -26,6 +34,13 @@ func tableEngine() *plugin.Table {
 		Columns: []*plugin.Column{
 			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path (mount point) of the secrets engine"},
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of the secrets engine"},
+			{Name: "description", Type: proto.ColumnType_STRING, Description: "Description associated to mounted engine"},
+			{Name: "accessor", Type: proto.ColumnType_STRING, Description: "The accessor used by the secrets engine"},
+			{Name: "version", Type: proto.ColumnType_INT, Description: "The secrets engine version"},
+			{Name: "local", Type: proto.ColumnType_BOOL, Description: "Is Local Mount (Local mounts are not replicated across clusters)"},
+			{Name: "seal_wrap", Type: proto.ColumnType_BOOL, Description: "Is the secrets engine running seal wrap (https://www.vaultproject.io/docs/enterprise/sealwrap)"},
+			{Name: "default_ttl", Type: proto.ColumnType_INT, Description: "Default TTL of Secrets within Engine"},
+			{Name: "max_ttl", Type: proto.ColumnType_INT, Description: "Max TTL of Secrets within Engine"},
 		},
 	}
 }
@@ -39,8 +54,21 @@ func listEngines(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 
 	data, err := conn.Sys().ListMounts()
 	for path := range data {
-		d.StreamListItem(ctx, &Engine{Type: data[path].Type, Path: path})
+		ver, err := strconv.ParseInt(data[path].Options["version"], 0, 32)
+		if err != nil {
+			ver = 0
+		}
 
+		d.StreamListItem(ctx, &Engine{
+			Type:        data[path].Type,
+			Path:        path,
+			Description: data[path].Description,
+			Accessor:    data[path].Accessor,
+			Version:     ver,
+			Local:       data[path].Local,
+			SealWrap:    data[path].SealWrap,
+			DefaultTtl:  data[path].Config.DefaultLeaseTTL,
+			MaxTtl:      data[path].Config.MaxLeaseTTL})
 	}
 
 	return nil, nil
@@ -68,5 +96,19 @@ func getEngine(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		return nil, nil
 	}
 
-	return &Engine{Type: data[path].Type, Path: path}, nil
+	ver, err := strconv.ParseInt(data[path].Options["version"], 0, 32)
+	if err != nil {
+		ver = 0
+	}
+
+	return &Engine{
+		Type:        data[path].Type,
+		Path:        path,
+		Description: data[path].Description,
+		Accessor:    data[path].Accessor,
+		Version:     ver,
+		Local:       data[path].Local,
+		SealWrap:    data[path].SealWrap,
+		DefaultTtl:  data[path].Config.DefaultLeaseTTL,
+		MaxTtl:      data[path].Config.MaxLeaseTTL}, nil
 }
