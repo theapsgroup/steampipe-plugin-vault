@@ -2,7 +2,6 @@ package vault
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/hashicorp/vault/api"
@@ -13,10 +12,6 @@ import (
 type AwsRole struct {
 	Path string
 	Role string
-}
-
-type SecretData struct {
-	Keys []string `json:"keys"`
 }
 
 func tableAwsRole() *plugin.Table {
@@ -55,7 +50,7 @@ func listRoles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 			return nil, err
 		}
 
-		for _, role := range roles.Keys {
+		for _, role := range roles {
 			d.StreamListItem(ctx, &AwsRole{Path: mount, Role: role})
 		}
 	}
@@ -101,17 +96,14 @@ func getAwsMounts(allMounts map[string]*api.MountOutput, err error) (map[string]
 	return filtered, nil
 }
 
-func listAwsRoles(client *api.Client, engine string) (SecretData, error) {
-	out := SecretData{}
-
+func listAwsRoles(client *api.Client, engine string) ([]string, error) {
 	data, err := client.Logical().List(replaceDoubleSlash(fmt.Sprintf("/%s/roles", engine)))
 	if err != nil {
-		return SecretData{}, err
+		return []string{}, err
 	}
 
-	b, _ := json.Marshal(data.Data)
-	_ = json.Unmarshal([]byte(b), &out)
-	return out, nil
+	result := getSecretAsStrings(data)
+	return result, nil
 }
 
 func roleExists(client *api.Client, mountpoint string, role string) (bool, error) {

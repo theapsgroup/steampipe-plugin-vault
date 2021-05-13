@@ -53,19 +53,6 @@ func tableKvSecret() *plugin.Table {
 	}
 }
 
-// Converts and api.Secret object into a slice of strings containing all secret paths
-func getSecretAsStrings(ctx context.Context, s *api.Secret) []string {
-	if s == nil || s.Data["keys"] == nil || len(s.Data["keys"].([]interface{})) == 0 {
-		return []string{}
-	}
-	var secrets []string
-	for _, s := range s.Data["keys"].([]interface{}) {
-		secrets = append(secrets, fmt.Sprintf("%s", s.(string)))
-
-	}
-	return secrets
-}
-
 // Returns the metadata of a secret, or nil if no secret was found
 func getSecretMetadata(ctx context.Context, client *api.Client, engine string, keyPath string) (*KvSecret, error) {
 	data, err := client.Logical().Read(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, keyPath)))
@@ -101,7 +88,7 @@ func getSecretMetadata(ctx context.Context, client *api.Client, engine string, k
 func listPathSecrets(ctx context.Context, client *api.Client, engine string, keyPath string) ([]string, error) {
 	var secrets []string
 	data, err := client.Logical().List(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, keyPath)))
-	for _, k := range getSecretAsStrings(ctx, data) {
+	for _, k := range getSecretAsStrings(data) {
 		fullPath := replaceDoubleSlash(fmt.Sprintf("%s/%s", keyPath, k))
 		secrets = append(secrets, fullPath)
 	}
