@@ -3,6 +3,7 @@ package vault
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -53,6 +54,19 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 // Util func to replace any double / with single ones, used to make concatting paths easier
 func replaceDoubleSlash(url string) string {
 	return strings.ReplaceAll(url, "//", "/")
+}
+
+// Converts and api.Secret object into a slice of strings containing all secret paths
+func getSecretAsStrings(s *api.Secret) []string {
+	if s == nil || s.Data["keys"] == nil || len(s.Data["keys"].([]interface{})) == 0 {
+		return []string{}
+	}
+	var secrets []string
+	for _, s := range s.Data["keys"].([]interface{}) {
+		secrets = append(secrets, fmt.Sprintf("%s", s.(string)))
+
+	}
+	return secrets
 }
 
 // Transforms
