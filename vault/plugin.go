@@ -21,6 +21,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"vault_sys_health": tableSysHealth(),
 			"vault_aws_role":   tableAwsRole(),
 			"vault_pki_cert":   tablePkiCert(),
+			"vault_pki_role":   tablePkiRole(),
 		},
 	}
 
