@@ -135,12 +135,15 @@ func listSecrets(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 	}
 
 	// Queue up the mounts to explore
-	mounts, err := conn.Sys().ListMounts()
+	allMounts, err := conn.Sys().ListMounts()
+	if err != nil {
+		return nil, err
+	}
+
+	mounts := filterMounts(allMounts, "kv")
 	for path := range mounts {
-		if mounts[path].Type == "kv" {
-			foldersChan <- SecretPath{Engine: path, Path: "/"}
-			wg.Add(1)
-		}
+		foldersChan <- SecretPath{Engine: path, Path: "/"}
+		wg.Add(1)
 	}
 
 	// Workers for parallel requests

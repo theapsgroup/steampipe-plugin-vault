@@ -60,9 +60,9 @@ func replaceDoubleSlash(url string) string {
 func filterMounts(in map[string]*api.MountOutput, mountType string) map[string]*api.MountOutput {
 	filtered := map[string]*api.MountOutput{}
 
-	for i, mount := range in {
+	for key, mount := range in {
 		if mount.Type == mountType {
-			filtered[i] = mount
+			filtered[key] = mount
 		}
 	}
 
