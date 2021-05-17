@@ -10,7 +10,7 @@ For querying PKI Certificates in the pki [engines](https://github.com/theapsgrou
 | serial | The serial identifier of the certificate |
 | request_id | Request identifier |
 | lease_id | Lease identifier |
-| lease_duration | Duration of the lease in seconds (0 if not set) |
+| lease_duration | Duration of the lease in seconds (0 [infinite] if not set) |
 | renewable | Is the certificate renewable |
 
 ## Examples

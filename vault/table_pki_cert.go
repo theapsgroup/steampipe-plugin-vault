@@ -33,7 +33,7 @@ func tablePkiCert() *plugin.Table {
 			{Name: "serial", Type: proto.ColumnType_STRING, Description: "The serial identifier of the certificate"},
 			{Name: "request_id", Type: proto.ColumnType_STRING, Description: "Request Identifier"},
 			{Name: "lease_id", Type: proto.ColumnType_STRING, Description: "Lease Identifier", Transform: transform.FromGo()},
-			{Name: "lease_duration", Type: proto.ColumnType_INT, Description: "Duration of Lease in seconds (0 if not set)", Transform: transform.FromGo()},
+			{Name: "lease_duration", Type: proto.ColumnType_INT, Description: "Duration of Lease in seconds (0 [infinite] if not set)", Transform: transform.FromGo()},
 			{Name: "renewable", Type: proto.ColumnType_BOOL, Description: "Indication if the certificate is renewable"},
 		},
 	}
