@@ -148,16 +148,3 @@ func getRoleDetails(client *api.Client, engine string, roleName string) (*AwsRol
 
 	return role, nil
 }
-
-func getValues(in map[string]interface{}, key string) []string {
-	if in[key] == nil {
-		return []string{}
-	}
-
-	var out []string
-	for _, s := range in[key].([]interface{}) {
-		out = append(out, fmt.Sprintf("%s", s.(string)))
-	}
-
-	return out
-}
