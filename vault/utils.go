@@ -56,6 +56,33 @@ func replaceDoubleSlash(url string) string {
 	return strings.ReplaceAll(url, "//", "/")
 }
 
+// Util func to obtain filtered mounts from all mounts
+func filterMounts(in map[string]*api.MountOutput, mountType string) map[string]*api.MountOutput {
+	filtered := map[string]*api.MountOutput{}
+
+	for key, mount := range in {
+		if mount.Type == mountType {
+			filtered[key] = mount
+		}
+	}
+
+	return filtered
+}
+
+// Util func to obtain []string by key from map[string]interface
+func getValues(in map[string]interface{}, key string) []string {
+	if in[key] == nil {
+		return []string{}
+	}
+
+	var out []string
+	for _, s := range in[key].([]interface{}) {
+		out = append(out, fmt.Sprintf("%s", s.(string)))
+	}
+
+	return out
+}
+
 // Converts and api.Secret object into a slice of strings containing all secret paths
 func getSecretAsStrings(s *api.Secret) []string {
 	if s == nil || s.Data["keys"] == nil || len(s.Data["keys"].([]interface{})) == 0 {

@@ -58,11 +58,12 @@ func listRoles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		return nil, err
 	}
 
-	mounts, err := getAwsMounts(conn.Sys().ListMounts())
+	allMounts, err := conn.Sys().ListMounts()
 	if err != nil {
 		return nil, err
 	}
 
+	mounts := filterMounts(allMounts, "aws")
 	for mount := range mounts {
 		roles, err := listAwsRoles(conn, mount)
 		if err != nil {
@@ -147,17 +148,4 @@ func getRoleDetails(client *api.Client, engine string, roleName string) (*AwsRol
 	role.IamGroups = getValues(data.Data, "iam_groups")
 
 	return role, nil
-}
-
-func getValues(in map[string]interface{}, key string) []string {
-	if in[key] == nil {
-		return []string{}
-	}
-
-	var out []string
-	for _, s := range in[key].([]interface{}) {
-		out = append(out, fmt.Sprintf("%s", s.(string)))
-	}
-
-	return out
 }
