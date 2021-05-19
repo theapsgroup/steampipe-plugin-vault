@@ -67,5 +67,9 @@ The following tables are available for querying, follow the links for more infor
 
 - [vault_sys_health](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_sys_health.md)
 - [vault_engine](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engine.md)
+- [vault_auth](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_auth.md)
 - [vault_kv_secret](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_kv_secret.md)
 - [vault_aws_role](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_aws_role.md)
+- [vault_azure_role](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_azure_role.md)
+- [vault_pki_cert](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_pki_cert.md)
+- [vault_pki_role](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_pki_role.md)
