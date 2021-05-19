@@ -35,3 +35,6 @@
 # Output Binary
 steampipe-plugin-vault
 steampipe-plugin-vault.plugin
+
+# Goland
+.idea/
