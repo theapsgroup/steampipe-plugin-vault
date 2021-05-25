@@ -2,20 +2,19 @@
 org: The APS Group
 category: ["security"]
 icon_url: "/images/plugins/theapsgroup/vault.svg"
-brand_color: "#ffec6e"
+brand_color: "#003A75"
 display_name: "Hashicorp Vault"
 short_name: "vault"
 description: "Steampipe plugin for querying available secret keys (not values), etc from Hashicorp Vault."
 social_about: Query Hashicorp Vault with SQL! Open source CLI. No DB required.
-social_preview: "/images/plugins/turbot/vault-social-graphic.png"
-og_image: "/images/plugins/theapsgroup/vault-social-graphic.png"
+social_preview: "/images/plugins/theapsgroup/vault-social-graphic.png"
 ---
 
 # Hashicorp Vault + Turbot Steampipe
 
 [Vault](https://www.vaultproject.io/) is an industry-leading Secrets Management & Data Protection solution from [Hashicorp](https://www.hashicorp.com/).
 
-[Steampipe](https://steampipe.io/) is an open source CLI tool for querying cloud APIs using SQL from [Turbot](https://turbot.com/)
+[Steampipe](https://steampipe.io/) is an open source CLI for querying cloud APIs using SQL from [Turbot](https://turbot.com/)
 
 ## Getting Started
 
