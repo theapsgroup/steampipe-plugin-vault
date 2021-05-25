@@ -1,12 +1,13 @@
 ---
-organization: The APS Group
+org: The APS Group
 category: ["security"]
 icon_url: "/images/plugins/theapsgroup/vault.svg"
 brand_color: "#ffec6e"
 display_name: "Hashicorp Vault"
 short_name: "vault"
-description: "Steampipe plugin for querying availabe secret keys (not values), etc from Hashicorp Vault."
-og_description: Query Hashicorp Vault with SQL! Open source CLI. No DB required. 
+description: "Steampipe plugin for querying available secret keys (not values), etc from Hashicorp Vault."
+social_about: Query Hashicorp Vault with SQL! Open source CLI. No DB required.
+social_preview: "/images/plugins/turbot/vault-social-graphic.png"
 og_image: "/images/plugins/theapsgroup/vault-social-graphic.png"
 ---
 
@@ -18,16 +19,12 @@ og_image: "/images/plugins/theapsgroup/vault-social-graphic.png"
 
 ## Getting Started
 
-### Build & Installation
+### Installation
 
-Currently, you will need to build and install this plugin manually via the following:
+Download and install the latest Vault plugin:
 
 ```shell
-go build -o steampipe-plugin-vault.plugin
-
-mv steampipe-plugin-vault.plugin ~/.steampipe/plugins/hub.steampipe.io/plugins/theapsgroup/vault@latest/steampipe-plugin-vault.plugin
-
-cp config/vault.spc ~/.steampipe/config/vault.spc
+steampipe plugin install vault
 ```
 
 ### Prerequisites
@@ -41,8 +38,8 @@ The preferred option is to use Environment Variables for configuration as the Va
 
 Environment Variables (default from Hashicorp Vault):
 
-- `VAULT_ADDR` for the server address (ex: https://vault.mycorp.com/)
-- `VAULT_TOKEN` for the API token (ex: s.f7Ea3C3ojOYE0GRLzmhSGNkE)
+- `VAULT_ADDR` for the server address (ex: `https://vault.mycorp.com/`)
+- `VAULT_TOKEN` for the API token (ex: `s.f7Ea3C3ojOYE0GRLzmhSGNkE`)
 
 Configuration File:
 

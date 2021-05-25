@@ -52,7 +52,7 @@ func tablePkiRole() *plugin.Table {
 			{Name: "client_flag", Type: proto.ColumnType_BOOL, Description: "Can generate client based certificates"},
 			{Name: "code_signing_flag", Type: proto.ColumnType_BOOL, Description: "Can generate code-signing based certificates"},
 			{Name: "key_bits", Type: proto.ColumnType_INT, Description: "Length of key in bits"},
-			{Name: "key_type", Type: proto.ColumnType_STRING, Description: "Type of key used, exmaple 'RSA'"},
+			{Name: "key_type", Type: proto.ColumnType_STRING, Description: "Type of key used, example 'RSA'"},
 			{Name: "ttl", Type: proto.ColumnType_INT, Description: "Default TTL", Transform: transform.FromField("Ttl")},
 			{Name: "max_ttl", Type: proto.ColumnType_INT, Description: "Maximum TTL", Transform: transform.FromField("MaxTtl")},
 			{Name: "server_flag", Type: proto.ColumnType_BOOL, Description: "Can generate server based certificates"},

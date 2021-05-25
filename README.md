@@ -10,7 +10,13 @@ select * from vault_engine
 
 ## Get Started
 
-Build & Installation from Source:
+### Installation
+
+```shell
+steampipe plugin install vault
+```
+
+Or if you prefer, you can clone this repository and build/install from source directly.
 
 ```shell
 go build -o steampipe-plugin-vault.plugin
@@ -20,13 +26,22 @@ mv steampipe-plugin-vault.plugin ~/.steampipe/plugins/hub.steampipe.io/plugins/t
 cp config/vault.spc ~/.steampipe/config/vault.spc
 ```
 
+### Configuration
+
 Configuration is preferably done by ensuring you have the default Vault Environment Variables set:
 
 - `VAULT_ADDR` for the address of your Vault Server
 - `VAULT_TOKEN` for the API token used to access Vault
 
-However these can also be set in the configuration file:
+However, these can also be set in the configuration file:
+
 `vi ~/.steampipe/config/vault.spc` 
+
+### Testing Installation
+
+```shell
+steampipe query "select * from vault_engine"
+```
 
 ## Documentation
 
