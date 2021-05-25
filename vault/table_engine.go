@@ -37,7 +37,7 @@ func tableEngine() *plugin.Table {
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "Description associated to mounted engine"},
 			{Name: "accessor", Type: proto.ColumnType_STRING, Description: "The accessor used by the secrets engine"},
 			{Name: "version", Type: proto.ColumnType_INT, Description: "The secrets engine version"},
-			{Name: "local", Type: proto.ColumnType_BOOL, Description: "Is Local Mount (Local mounts are not replicated across clusters)"},
+			{Name: "local", Type: proto.ColumnType_BOOL, Description: "Indicates if it is a Local Mount (local mounts are not replicated across clusters)"},
 			{Name: "seal_wrap", Type: proto.ColumnType_BOOL, Description: "Is the secrets engine running seal wrap (https://www.vaultproject.io/docs/enterprise/sealwrap)"},
 			{Name: "default_ttl", Type: proto.ColumnType_INT, Description: "Default TTL of Secrets within Engine"},
 			{Name: "max_ttl", Type: proto.ColumnType_INT, Description: "Max TTL of Secrets within Engine"},

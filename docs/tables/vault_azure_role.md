@@ -2,13 +2,6 @@
 
 Azure roles contained within Vault.
 
-## Columns
-
-| Column | Description |
-| - | - |
-| path | The path at which an engine is mounted - for example `azure/` |
-| role | The name of the role |
-
 ## Examples
 
 ### List All Azure Roles
