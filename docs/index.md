@@ -1,13 +1,13 @@
 ---
 organization: The APS Group
 category: ["security"]
-icon_url: "/images/plugins/turbot/vault.svg"
-brand_color: "#000000"
+icon_url: "/images/plugins/theapsgroup/vault.svg"
+brand_color: "#ffec6e"
 display_name: "Hashicorp Vault"
 short_name: "vault"
 description: "Steampipe plugin for querying availabe secret keys (not values), etc from Hashicorp Vault."
 og_description: Query Hashicorp Vault with SQL! Open source CLI. No DB required. 
-og_image: "/images/plugins/turbot/vault-social-graphic.png"
+og_image: "/images/plugins/theapsgroup/vault-social-graphic.png"
 ---
 
 # Hashicorp Vault + Turbot Steampipe
