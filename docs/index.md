@@ -23,7 +23,7 @@ social_preview: "/images/plugins/theapsgroup/vault-social-graphic.png"
 Download and install the latest Vault plugin:
 
 ```shell
-steampipe plugin install vault
+steampipe plugin install theapsgroup/vault
 ```
 
 ### Prerequisites

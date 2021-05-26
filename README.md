@@ -13,7 +13,7 @@ select * from vault_engine
 ### Installation
 
 ```shell
-steampipe plugin install vault
+steampipe plugin install theapsgroup/vault
 ```
 
 Or if you prefer, you can clone this repository and build/install from source directly.
