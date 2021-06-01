@@ -34,11 +34,11 @@ func init() {
 	vaultClient, _ = api.NewClient(nil)
 }
 
-// VaultClient() returns a configured and authenticated Vault client object. If
+// AwsClient() returns a configured and authenticated Vault client object. If
 // the client does not yet exist, it is created and authenticated. If it does
 // exist but the token is expired or near expiration, the token will be renewed
 // if possible, or a new token will be acquired.
-func VaultClient(config *vaultConfig, client *api.Client) (*api.Client, error) {
+func AwsClient(config *vaultConfig, client *api.Client) (*api.Client, error) {
 	if *config.AwsProvider == "" || *config.AwsRole == "" {
 		return nil, errors.New("Both aws auth provider, and aws auth role are required")
 	}
@@ -48,7 +48,7 @@ func VaultClient(config *vaultConfig, client *api.Client) (*api.Client, error) {
 	}
 
 	if isExpired() {
-		return vaultClient, VaultAuth(config)
+		return vaultClient, AwsAuth(config)
 	}
 
 	if shouldRenew() {
@@ -70,7 +70,7 @@ func shouldRenew() bool {
 // authentication instead. This is typically called internally.
 func RenewToken(config *vaultConfig) error {
 	if isExpired() || !tokenIsRenewable {
-		return VaultAuth(config)
+		return AwsAuth(config)
 	}
 
 	resp, err := vaultClient.Auth().Token().RenewSelf(int(tokenTTL))
@@ -101,7 +101,7 @@ func parseToken(resp *api.Secret) error {
 	return nil
 }
 
-// Call VaultAuth() to authenticate the Lambda execution role to the Vault auth
+// Call AwsAuth() to authenticate the Lambda execution role to the Vault auth
 // context specified by the VAULT_ADDR, VAULT_AUTH_PROVIDER, and VAULT_AUTH_ROLE
 // environment variables. If no error is returned, then VaultClient is ready to
 // go. This function is typically called internally.
@@ -109,7 +109,7 @@ func parseToken(resp *api.Secret) error {
 // This code was adapted from Hashicorp Vault:
 //   https://github.com/hashicorp/vault/blob/e2bb2ec3b93a242a167f763684f93df867bb253d/builtin/credential/aws/cli.go#L78
 //
-func VaultAuth(config *vaultConfig) error {
+func AwsAuth(config *vaultConfig) error {
 	sess, err := session.NewSession()
 	if err != nil {
 		return err

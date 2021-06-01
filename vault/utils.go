@@ -18,11 +18,8 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 	addr := os.Getenv("VAULT_ADDR")
 	tkn := os.Getenv("VAULT_TOKEN")
 
-	logger := plugin.Logger(ctx)
-
 	// In line with the vault CLI, these values can be set through environment variables.
 	vaultConfig := GetConfig(d.Connection)
-	logger.Warn("Config parsed")
 
 	if vaultConfig.Address == nil {
 		vaultConfig.Address = &addr
@@ -31,7 +28,6 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 	if vaultConfig.Token == nil {
 		vaultConfig.Token = &tkn
 	}
-	logger.Warn("Config parsed")
 
 	if *vaultConfig.Address == "" {
 		return nil, errors.New("Vault Address must be set either in VAULT_ADDR environment variable or in connection configuration file.")
@@ -45,10 +41,12 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 	apiConfig := &api.Config{Address: *vaultConfig.Address, HttpClient: httpClient}
 	client, err := api.NewClient(apiConfig)
 
-	logger.Warn("Client constructed")
-
 	if err != nil {
 		return nil, errors.New(err.Error())
+	}
+
+	if *vaultConfig.AuthType == "token" && *vaultConfig.Token == "" {
+		return nil, errors.New("Token must be set via environment or config file when using token auth_type")
 	}
 
 	if *vaultConfig.Token != "" {
@@ -58,8 +56,7 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 
 	switch *vaultConfig.AuthType {
 	case "aws":
-		logger.Warn("Using aws auth")
-		return VaultClient(&vaultConfig, client)
+		return AwsClient(&vaultConfig, client)
 	default:
 		return nil, errors.New(fmt.Sprintf("Unknown AuthType %s", *vaultConfig.AuthType))
 	}
