@@ -44,11 +44,42 @@ Configuration File:
 
 ```hcl
 connection "vault" {
-  plugin  = "theapsgroup/vault"
-  address = "https://vault.mycorp.com/"
-  token   = "s.f7Ea3C3ojOYE0GRLzmhSGNkE"
+  plugin    = "theapsgroup/vault"
+  address   = "https://vault.mycorp.com/"
+  auth_type = "token"
+  token     = "s.f7Ea3C3ojOYE0GRLzmhSGNkE"
 }
 ```
+#### Authentication
+
+Vault supports multiple authentication backends, currently token and AWS IAM are supported.
+Note that in line with the Vault cli behavior, if a vault token is supplied, that will be used instead of your configured authentication method.
+
+##### Token
+
+```
+connection "vault" {
+  auth_type = "token"
+  token     = "sometoken"
+}
+```
+
+##### AWS
+
+```
+connection "vault" {
+  auth_type = "aws"
+  aws_role = "steampipe-test-role"
+  aws_provider = "aws"
+}
+```
+
+`aws_role` is the name of the role as configured in the vault AWS authentication backend.
+
+`aws_provider` is the name of the access engine in vault
+
+The vault plugin will resolve the AWS credentials in the normal AWS SDK Credentials chain order.
+
 ### Testing
 
 A quick test can be performed from your terminal with:

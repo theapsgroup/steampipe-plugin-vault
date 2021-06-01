@@ -18,37 +18,48 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 	addr := os.Getenv("VAULT_ADDR")
 	tkn := os.Getenv("VAULT_TOKEN")
 
+	// In line with the vault CLI, these values can be set through environment variables.
 	vaultConfig := GetConfig(d.Connection)
-	if &vaultConfig != nil {
-		if vaultConfig.Address != nil {
-			addr = *vaultConfig.Address
-		}
-		if vaultConfig.Token != nil {
-			tkn = *vaultConfig.Token
-		}
+
+	if vaultConfig.Address == nil {
+		vaultConfig.Address = &addr
 	}
 
-	if addr == "" {
+	if vaultConfig.Token == nil {
+		vaultConfig.Token = &tkn
+	}
+
+	if *vaultConfig.Address == "" {
 		return nil, errors.New("Vault Address must be set either in VAULT_ADDR environment variable or in connection configuration file.")
-	}
-
-	if tkn == "" {
-		return nil, errors.New("Vault Token must be set either in VAULT_TOKEN environment variable or in connection configuration file.")
 	}
 
 	var httpClient = &http.Client{
 		Timeout: 10 * time.Second,
 	}
+	var err error
 
-	client, err := api.NewClient(&api.Config{Address: addr, HttpClient: httpClient})
+	apiConfig := &api.Config{Address: *vaultConfig.Address, HttpClient: httpClient}
+	client, err := api.NewClient(apiConfig)
 
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
 
-	client.SetToken(tkn)
+	if *vaultConfig.AuthType == "token" && *vaultConfig.Token == "" {
+		return nil, errors.New("Token must be set via environment or config file when using token auth_type")
+	}
 
-	return client, nil
+	if *vaultConfig.Token != "" {
+		client.SetToken(*vaultConfig.Token)
+		return client, nil
+	}
+
+	switch *vaultConfig.AuthType {
+	case "aws":
+		return AwsClient(&vaultConfig, client)
+	default:
+		return nil, errors.New(fmt.Sprintf("Unknown AuthType %s", *vaultConfig.AuthType))
+	}
 }
 
 // Util func to replace any double / with single ones, used to make concatting paths easier
