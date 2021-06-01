@@ -52,7 +52,8 @@ connection "vault" {
 ```
 #### Authentication
 
-Vault supports multiple authentication backends, currently token and AWS IAM are supported. To configure those:
+Vault supports multiple authentication backends, currently token and AWS IAM are supported.
+Note that in line with the Vault cli behavior, if a vault token is supplied, that will be used instead of your configured authentication method.
 
 ##### Token
 
