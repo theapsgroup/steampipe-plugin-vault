@@ -59,6 +59,8 @@ Note that in line with the Vault cli behavior, if a vault token is supplied, tha
 
 ```
 connection "vault" {
+  plugin    = "theapsgroup/vault"
+  address   = "https://vault.mycorp.com/"
   auth_type = "token"
   token     = "sometoken"
 }
@@ -68,6 +70,8 @@ connection "vault" {
 
 ```
 connection "vault" {
+  plugin    = "theapsgroup/vault"
+  address   = "https://vault.mycorp.com/"
   auth_type = "aws"
   aws_role = "steampipe-test-role"
   aws_provider = "aws"
