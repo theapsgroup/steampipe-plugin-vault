@@ -30,8 +30,6 @@ func init() {
 
 	// should be at least the length of the lambda runtime
 	renewalWindow = time.Duration(300) * time.Second
-
-	vaultClient, _ = api.NewClient(nil)
 }
 
 // AwsClient() returns a configured and authenticated Vault client object. If

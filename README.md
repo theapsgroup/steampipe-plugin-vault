@@ -22,7 +22,13 @@ Or if you prefer, you can clone this repository and build/install from source di
 go build -o steampipe-plugin-vault.plugin
 
 mv steampipe-plugin-vault.plugin ~/.steampipe/plugins/hub.steampipe.io/plugins/theapsgroup/vault@latest/steampipe-plugin-vault.plugin
+```
 
+Alternatively, `make install` will do the same steps as above.
+
+Copy the basic configuration:
+
+```shell
 cp config/vault.spc ~/.steampipe/config/vault.spc
 ```
 
