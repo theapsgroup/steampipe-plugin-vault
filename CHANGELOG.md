@@ -1,9 +1,10 @@
-## v0.0.4 [2021-09-15]
+## v0.0.4 [2021-09-16]
 
 _What's new?_
-
-- Fixes an issue where the AWS auth type would incorrectly ignore address configuration
 - Adds a makefile for easier installation while developing
+
+_Bug fixes_
+- Fixes an issue where the AWS auth type would incorrectly ignore address configuration
 
 ## v0.0.3 [2021-08-17]
 
