@@ -17,6 +17,7 @@ import (
 func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 	addr := os.Getenv("VAULT_ADDR")
 	tkn := os.Getenv("VAULT_TOKEN")
+	defaultAuthType := "token"
 
 	// In line with the vault CLI, these values can be set through environment variables.
 	vaultConfig := GetConfig(d.Connection)
@@ -27,6 +28,10 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 
 	if vaultConfig.Token == nil {
 		vaultConfig.Token = &tkn
+	}
+
+	if vaultConfig.AuthType == nil {
+		vaultConfig.AuthType = &defaultAuthType
 	}
 
 	if *vaultConfig.Address == "" {
