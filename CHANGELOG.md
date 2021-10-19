@@ -1,3 +1,8 @@
+## v0.0.5 [WIP]
+
+_Bug fixes_
+- Fixed an issue where not setting an `auth_type` would cause an issue [#19](https://github.com/theapsgroup/steampipe-plugin-vault/issues/19)
+
 ## v0.0.4 [2021-09-16]
 
 _What's new?_
