@@ -1,5 +1,12 @@
 ## v0.0.5 [WIP]
 
+_Enhancements_
+- Upgraded to golang version 1.17
+- Upgraded steampipe sdk version to v1.8.2
+- Upgraded vault version to v1.3.0
+- Upgraded aws sdk version to v1.42.11
+
+
 _Bug fixes_
 - Fixed an issue where not setting an `auth_type` would cause an issue [#19](https://github.com/theapsgroup/steampipe-plugin-vault/issues/19)
 
