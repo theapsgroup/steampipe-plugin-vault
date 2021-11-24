@@ -6,7 +6,6 @@ _Enhancements_
 - Upgraded vault version to v1.3.0
 - Upgraded aws sdk version to v1.42.11
 
-
 _Bug fixes_
 - Fixed an issue where not setting an `auth_type` would cause an issue [#19](https://github.com/theapsgroup/steampipe-plugin-vault/issues/19)
 
