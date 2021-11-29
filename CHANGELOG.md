@@ -1,4 +1,4 @@
-## v0.0.5 [WIP]
+## v0.0.5 [2021-11-29]
 
 _Enhancements_
 - Upgraded to golang version 1.17
