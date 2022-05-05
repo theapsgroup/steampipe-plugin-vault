@@ -2,9 +2,9 @@ package vault
 
 import (
 	"context"
-	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
 )
 
 type AuthMethod struct {
@@ -22,16 +22,16 @@ type AuthMethod struct {
 
 func tableAuth() *plugin.Table {
 	return &plugin.Table{
-		Name: "vault_auth",
+		Name:        "vault_auth",
 		Description: "Vault Authentication Methods",
 		List: &plugin.ListConfig{
 			Hydrate: listAuth,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("path"),
-			Hydrate: getAuth,
+			Hydrate:    getAuth,
 		},
-		Columns: []*plugin.Column {
+		Columns: []*plugin.Column{
 			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path (mount point) of the authentication method"},
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of authentication method"},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "Description associated to the authentication method"},
@@ -59,16 +59,16 @@ func listAuth(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (
 
 	for path, auth := range auths {
 		d.StreamListItem(ctx, &AuthMethod{
-			Path: path,
-			Type: auth.Type,
-			Description: auth.Description,
-			Accessor: auth.Accessor,
-			Local: auth.Local,
-			SealWrap: auth.SealWrap,
+			Path:                  path,
+			Type:                  auth.Type,
+			Description:           auth.Description,
+			Accessor:              auth.Accessor,
+			Local:                 auth.Local,
+			SealWrap:              auth.SealWrap,
 			ExternalEntropyAccess: auth.ExternalEntropyAccess,
-			DefaultTtl: auth.Config.DefaultLeaseTTL,
-			MaxTtl: auth.Config.MaxLeaseTTL,
-			RequestHeaders: auth.Config.PassthroughRequestHeaders,
+			DefaultTtl:            auth.Config.DefaultLeaseTTL,
+			MaxTtl:                auth.Config.MaxLeaseTTL,
+			RequestHeaders:        auth.Config.PassthroughRequestHeaders,
 		})
 	}
 
@@ -95,15 +95,15 @@ func getAuth(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (i
 	}
 
 	return &AuthMethod{
-		Path: path,
-		Type: auth.Type,
-		Description: auth.Description,
-		Accessor: auth.Accessor,
-		Local: auth.Local,
-		SealWrap: auth.SealWrap,
+		Path:                  path,
+		Type:                  auth.Type,
+		Description:           auth.Description,
+		Accessor:              auth.Accessor,
+		Local:                 auth.Local,
+		SealWrap:              auth.SealWrap,
 		ExternalEntropyAccess: auth.ExternalEntropyAccess,
-		DefaultTtl: auth.Config.DefaultLeaseTTL,
-		MaxTtl: auth.Config.MaxLeaseTTL,
-		RequestHeaders: auth.Config.PassthroughRequestHeaders,
+		DefaultTtl:            auth.Config.DefaultLeaseTTL,
+		MaxTtl:                auth.Config.MaxLeaseTTL,
+		RequestHeaders:        auth.Config.PassthroughRequestHeaders,
 	}, nil
 }

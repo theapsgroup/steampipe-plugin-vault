@@ -3,8 +3,8 @@ package vault
 import (
 	"context"
 	"fmt"
-	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
 )
 
 type AzureRole struct {
@@ -14,7 +14,7 @@ type AzureRole struct {
 
 func tableAzureRole() *plugin.Table {
 	return &plugin.Table{
-		Name: "vault_azure_role",
+		Name:        "vault_azure_role",
 		Description: "Vault Azure Configurations",
 		List: &plugin.ListConfig{
 			Hydrate: listAzureRoles,

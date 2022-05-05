@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/vault/api"
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
 )
 
 func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
@@ -67,7 +67,7 @@ func connect(ctx context.Context, d *plugin.QueryData) (*api.Client, error) {
 	}
 }
 
-// Util func to replace any double / with single ones, used to make concatting paths easier
+// Util func to replace any double / with single ones, used to make concatenating paths easier
 func replaceDoubleSlash(url string) string {
 	return strings.ReplaceAll(url, "//", "/")
 }

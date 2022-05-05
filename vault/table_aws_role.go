@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/vault/api"
-	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
 )
 
 type AwsRole struct {
@@ -99,22 +99,6 @@ func getRole(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (i
 	}
 
 	return data, nil
-}
-
-// Filter mounts for those of type 'aws'
-func getAwsMounts(allMounts map[string]*api.MountOutput, err error) (map[string]*api.MountOutput, error) {
-	if err != nil {
-		return nil, err
-	}
-	filtered := map[string]*api.MountOutput{}
-
-	for i, mount := range allMounts {
-		if mount.Type == "aws" {
-			filtered[i] = mount
-		}
-	}
-
-	return filtered, nil
 }
 
 func listAwsRoles(client *api.Client, engine string) ([]string, error) {

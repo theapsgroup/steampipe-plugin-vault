@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/vault/api"
-	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
 )
 
 type SecretPath struct {
@@ -18,7 +18,7 @@ type SecretPath struct {
 	Path   string
 }
 
-// The structure of a KV secret.
+// KvSecret The structure of a KV secret.
 // Key is the path within the mountpoint.
 // Path is the name of the engine
 type KvSecret struct {
