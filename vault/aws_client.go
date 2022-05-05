@@ -32,7 +32,7 @@ func init() {
 	renewalWindow = time.Duration(300) * time.Second
 }
 
-// AwsClient() returns a configured and authenticated Vault client object. If
+// AwsClient returns a configured and authenticated Vault client object. If
 // the client does not yet exist, it is created and authenticated. If it does
 // exist but the token is expired or near expiration, the token will be renewed
 // if possible, or a new token will be acquired.
@@ -64,7 +64,7 @@ func shouldRenew() bool {
 	return time.Now().Add(renewalWindow).After(tokenExpiration)
 }
 
-// Renew the token if it is renewable. If it isn't, or if it's expired, refresh
+// RenewToken renews the token if it is renewable. If it isn't, or if it's expired, refresh
 // authentication instead. This is typically called internally.
 func RenewToken(config *vaultConfig) error {
 	if isExpired() || !tokenIsRenewable {
@@ -99,7 +99,7 @@ func parseToken(resp *api.Secret) error {
 	return nil
 }
 
-// Call AwsAuth() to authenticate the Lambda execution role to the Vault auth
+// AwsAuth authenticates the Lambda execution role to the Vault auth
 // context specified by the VAULT_ADDR, VAULT_AUTH_PROVIDER, and VAULT_AUTH_ROLE
 // environment variables. If no error is returned, then VaultClient is ready to
 // go. This function is typically called internally.
@@ -116,7 +116,10 @@ func AwsAuth(config *vaultConfig) error {
 	stsSvc := sts.New(sess)
 	req, _ := stsSvc.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
 
-	req.Sign()
+	err = req.Sign()
+	if err != nil {
+		return err
+	}
 
 	headers, err := json.Marshal(req.HTTPRequest.Header)
 	if err != nil {

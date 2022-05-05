@@ -3,8 +3,8 @@ package vault
 import (
 	"context"
 	"fmt"
-	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
 )
 
 type AzureConfig struct {
@@ -17,7 +17,7 @@ type AzureConfig struct {
 
 func tableAzureConfig() *plugin.Table {
 	return &plugin.Table{
-		Name: "vault_azure_config",
+		Name:        "vault_azure_config",
 		Description: "Vault Azure Configurations",
 		List: &plugin.ListConfig{
 			Hydrate: listAzureConfigs,
@@ -51,11 +51,11 @@ func listAzureConfigs(ctx context.Context, d *plugin.QueryData, h *plugin.Hydrat
 		}
 
 		d.StreamListItem(ctx, &AzureConfig{
-			Path: path,
+			Path:           path,
 			SubscriptionId: config.Data["subscription_id"].(string),
-			TenantId: config.Data["tenant_id"].(string),
-			ClientId: config.Data["client_id"].(string),
-			Environment: config.Data["environment"].(string),
+			TenantId:       config.Data["tenant_id"].(string),
+			ClientId:       config.Data["client_id"].(string),
+			Environment:    config.Data["environment"].(string),
 		})
 	}
 

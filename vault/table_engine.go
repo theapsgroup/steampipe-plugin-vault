@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
 )
 
 type Engine struct {
@@ -92,7 +92,6 @@ func getEngine(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 
 	result := data[path]
 	if result == nil {
-		// TODO: figure out if this is expected to be error
 		return nil, nil
 	}
 

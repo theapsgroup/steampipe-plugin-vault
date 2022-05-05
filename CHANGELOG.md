@@ -1,8 +1,12 @@
+## v0.1.0 [2022-05-05]
+- Upgraded to golang version 1.18
+- Upgraded Steampipe sdk version to v3.1.0
+
 ## v0.0.5 [2021-11-29]
 
 _Enhancements_
 - Upgraded to golang version 1.17
-- Upgraded steampipe sdk version to v1.8.2
+- Upgraded Steampipe sdk version to v1.8.2
 - Upgraded vault version to v1.3.0
 - Upgraded aws sdk version to v1.42.11
 
