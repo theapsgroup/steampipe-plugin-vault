@@ -1,6 +1,6 @@
 # Table: vault_kv_secret
 
-For working with paths for secrets in the kv [engines](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engines.md)
+For working with paths for secrets in the kv [engines](https://github.com/theapsgroup/steampipe-plugin-vault/blob/main/docs/tables/vault_engine.md)
 
 > Note: This does not expose the contents of the secrets by design.
 
