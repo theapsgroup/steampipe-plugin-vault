@@ -19,6 +19,7 @@ type SysHealth struct {
 	Version                    string
 	ClusterName                string
 	ClusterID                  string
+	LastWal                    uint64
 }
 
 func tableSysHealth() *plugin.Table {
@@ -28,18 +29,7 @@ func tableSysHealth() *plugin.Table {
 		List: &plugin.ListConfig{
 			Hydrate: getSysHealth,
 		},
-		Columns: []*plugin.Column{
-			{Name: "initialized", Type: proto.ColumnType_BOOL, Description: "Is Initialized"},
-			{Name: "sealed", Type: proto.ColumnType_BOOL, Description: "Is sealed"},
-			{Name: "standby", Type: proto.ColumnType_BOOL, Description: "Is in standby"},
-			{Name: "performance_standby", Type: proto.ColumnType_BOOL, Description: "Is Performance Standby"},
-			{Name: "replication_performance_mode", Type: proto.ColumnType_STRING, Description: "Replication Performance Mode"},
-			{Name: "replication_dr_mode", Type: proto.ColumnType_STRING, Description: "Replication Disaster Recovery Mode"},
-			{Name: "server_time_utc", Type: proto.ColumnType_TIMESTAMP, Description: "Server Time in UTC", Transform: transform.FromField("ServerTimeUtc").Transform(convertTimestamp)},
-			{Name: "version", Type: proto.ColumnType_STRING, Description: "Hashicorp Vault Version"},
-			{Name: "cluster_name", Type: proto.ColumnType_STRING, Description: "Name of Vault Cluster"},
-			{Name: "cluster_id", Type: proto.ColumnType_STRING, Description: "Identity of Vault Cluster"},
-		},
+		Columns: healthColumns(),
 	}
 }
 
@@ -67,7 +57,69 @@ func getSysHealth(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDat
 		Version:                    data.Version,
 		ClusterName:                data.ClusterName,
 		ClusterID:                  data.ClusterID,
+		LastWal:                    data.LastWAL,
 	})
 
 	return nil, nil
+}
+
+func healthColumns() []*plugin.Column {
+	return []*plugin.Column{
+		{
+			Name:        "initialized",
+			Type:        proto.ColumnType_BOOL,
+			Description: "Is Initialized",
+		},
+		{
+			Name:        "sealed",
+			Type:        proto.ColumnType_BOOL,
+			Description: "Is sealed",
+		},
+		{
+			Name:        "standby",
+			Type:        proto.ColumnType_BOOL,
+			Description: "Is in standby",
+		},
+		{
+			Name:        "performance_standby",
+			Type:        proto.ColumnType_BOOL,
+			Description: "Is Performance Standby",
+		},
+		{
+			Name:        "replication_performance_mode",
+			Type:        proto.ColumnType_STRING,
+			Description: "Replication Performance Mode",
+		},
+		{
+			Name:        "replication_dr_mode",
+			Type:        proto.ColumnType_STRING,
+			Description: "Replication Disaster Recovery Mode",
+		},
+		{
+			Name:        "server_time_utc",
+			Type:        proto.ColumnType_TIMESTAMP,
+			Description: "Server Time in UTC",
+			Transform:   transform.FromField("ServerTimeUtc").Transform(convertTimestamp),
+		},
+		{
+			Name:        "version",
+			Type:        proto.ColumnType_STRING,
+			Description: "Hashicorp Vault Version",
+		},
+		{
+			Name:        "cluster_name",
+			Type:        proto.ColumnType_STRING,
+			Description: "Name of Vault Cluster",
+		},
+		{
+			Name:        "cluster_id",
+			Type:        proto.ColumnType_STRING,
+			Description: "Identity of Vault Cluster",
+		},
+		{
+			Name:        "last_wal",
+			Type:        proto.ColumnType_INT,
+			Description: "Value of last WAL",
+		},
+	}
 }
