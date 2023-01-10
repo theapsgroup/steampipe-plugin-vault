@@ -2,9 +2,9 @@ package vault
 
 import (
 	"context"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 type AuthMethod struct {
@@ -86,7 +86,7 @@ func getAuth(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (i
 		return nil, err
 	}
 
-	q := d.KeyColumnQuals
+	q := d.EqualsQuals
 	path := q["path"].GetStringValue()
 
 	auth := auths[path]

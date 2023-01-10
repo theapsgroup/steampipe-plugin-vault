@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 type Engine struct {
@@ -87,7 +87,7 @@ func getEngine(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		return nil, err
 	}
 
-	quals := d.KeyColumnQuals
+	quals := d.EqualsQuals
 	path := quals["path"].GetStringValue()
 
 	result := data[path]
