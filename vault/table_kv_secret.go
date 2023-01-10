@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/vault/api"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 type SecretPath struct {
@@ -176,7 +176,7 @@ func getSecret(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		return nil, err
 	}
 
-	quals := d.KeyColumnQuals
+	quals := d.EqualsQuals
 	keyPath := quals["key"].GetStringValue()
 	mountpoint := quals["path"].GetStringValue()
 

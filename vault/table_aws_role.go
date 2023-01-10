@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/vault/api"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 type AwsRole struct {
@@ -86,7 +86,7 @@ func getRole(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (i
 		return nil, err
 	}
 
-	quals := d.KeyColumnQuals
+	quals := d.EqualsQuals
 	mountpoint := quals["path"].GetStringValue()
 	role := quals["role"].GetStringValue()
 
