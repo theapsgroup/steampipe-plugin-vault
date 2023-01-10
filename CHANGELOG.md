@@ -1,8 +1,16 @@
-## v0.2.0 [WIP]
+## v0.2.0 [2023-01-10]
+
+_What's new?_
+
+- Added `plugin_version`, `deprecation_status` & `options` columns to the `vault_auth` table.
+- Added `plugin_version`, `deprecation_status` & `options` columns to the `vault_engine` table.
+- Added `last_wal` column to the `vault_health` table.
 
 _Enhancements_
 
 - Updated: Recompiled with [steampipe-plugin-sdk v5.0.1](https://github.com/turbot/steampipe-plugin-sdk/blob/main/CHANGELOG.md#v501-2022-11-30)
+- Updated: Recompiled with [AWS SDK v1.44.176](https://github.com/aws/aws-sdk-go/releases/tag/v1.44.176)
+- Updated: Recompiled with [Vault API v1.8.0](https://github.com/hashicorp/vault/tree/main/api)
 
 ## v0.1.1 [2022-10-08]
 
