@@ -13,17 +13,14 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
-type SecretPath struct {
-	Engine string
-	Path   string
-}
-
 // KvSecret The structure of a KV secret.
-// Key is the path within the mountpoint.
-// Path is the name of the engine
+// Mount is the mount point of the engine
+// Path is the path of the secret within the mount point.
+// Name is the name of the secret within the mount point, under the path.
 type KvSecret struct {
-	Key          string
+	Mount        string
 	Path         string
+	Name         string
 	CreatedTime  time.Time
 	DeletionTime time.Time
 	Destroyed    bool
@@ -36,15 +33,26 @@ func tableKvSecret() *plugin.Table {
 		Name:        "vault_kv_secret",
 		Description: "Vault kv secret keys",
 		List: &plugin.ListConfig{
+			KeyColumns: []*plugin.KeyColumn{
+				{
+					Name:    "mount",
+					Require: plugin.Optional,
+				},
+				{
+					Name:    "path",
+					Require: plugin.Required,
+				},
+			},
 			Hydrate: listSecrets,
 		},
 		Get: &plugin.GetConfig{
-			KeyColumns: plugin.AllColumns([]string{"key", "path"}),
+			KeyColumns: plugin.AllColumns([]string{"mount", "path", "name"}),
 			Hydrate:    getSecret,
 		},
 		Columns: []*plugin.Column{
-			{Name: "key", Type: proto.ColumnType_STRING, Description: "The key/path of the kv secret"},
-			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path (mount point) of the secrets engine"},
+			{Name: "mount", Type: proto.ColumnType_STRING, Description: "The mount point of the secrets engine"},
+			{Name: "path", Type: proto.ColumnType_STRING, Description: "The path of the kv secret"},
+			{Name: "name", Type: proto.ColumnType_STRING, Description: "The name of the kv secret"},
 			{Name: "created_time", Type: proto.ColumnType_TIMESTAMP, Description: "The date and time the secret was created"},
 			{Name: "deletion_time", Type: proto.ColumnType_TIMESTAMP, Description: "The date and time the secret was destroyed, if destroyed"},
 			{Name: "destroyed", Type: proto.ColumnType_BOOL, Description: "Whether the secret was destroyed"},
@@ -54,43 +62,49 @@ func tableKvSecret() *plugin.Table {
 }
 
 // Returns the metadata of a secret, or nil if no secret was found
-func getSecretMetadata(ctx context.Context, client *api.Client, engine string, keyPath string) (*KvSecret, error) {
-	data, err := client.Logical().Read(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, keyPath)))
+func getSecretMetadata(ctx context.Context, client *api.Client, secret *KvSecret) (*KvSecret, error) {
+	logger := plugin.Logger(ctx)
+
+	metadataUrl := fmt.Sprintf("/%smetadata/%s%s", secret.Mount, secret.Path, secret.Name)
+	logger.Debug("vault_kv_secret: getSecretMetadata", "metadataUrl", metadataUrl)
+	metadata, err := client.Logical().ReadWithContext(ctx, metadataUrl)
+	logger.Debug("vault_kv_secret: getSecretMetadata", "metadata", fmt.Sprintf("%#v", metadata))
 
 	if err != nil {
 		return nil, err
 	}
-	if data == nil {
+	if metadata == nil {
 		return nil, nil
 	}
 
-	secret := &KvSecret{Path: engine, Key: keyPath}
-
-	createdTime, err := time.Parse(time.RFC3339Nano, fmt.Sprintf("%s", data.Data["created_time"]))
+	createdTime, err := time.Parse(time.RFC3339Nano, fmt.Sprintf("%s", metadata.Data["created_time"]))
 	if err == nil {
 		secret.CreatedTime = createdTime
 	}
 
-	deletionTime, err := time.Parse(time.RFC3339Nano, fmt.Sprintf("%s", data.Data["deletion_time"]))
+	deletionTime, err := time.Parse(time.RFC3339Nano, fmt.Sprintf("%s", metadata.Data["deletion_time"]))
 	if err == nil {
 		secret.DeletionTime = deletionTime
 	}
 
-	secret.Version, _ = data.Data["current_version"].(json.Number).Int64()
+	secret.Version, _ = metadata.Data["current_version"].(json.Number).Int64()
 	// The returned structure contains a map of versions and their properties. E.g. {..., "versions": { "1": { "destroyed": true } } }
 	// This line walks tha tree and fetches the "destroyed" property of the current version
-	secret.Destroyed = data.Data["versions"].(map[string]interface{})[fmt.Sprintf("%d", secret.Version)].(map[string]interface{})["destroyed"].(bool)
+	secret.Destroyed = metadata.Data["versions"].(map[string]interface{})[fmt.Sprintf("%d", secret.Version)].(map[string]interface{})["destroyed"].(bool)
 
 	return secret, nil
 }
 
 // Lists all secrets in a secret engine, this has to be done recursively because you only get everything in a "folder"
-func listPathSecrets(ctx context.Context, client *api.Client, engine string, keyPath string) ([]string, error) {
-	var secrets []string
-	data, err := client.Logical().List(replaceDoubleSlash(fmt.Sprintf("/%s/metadata/%s", engine, keyPath)))
+func listPathSecrets(ctx context.Context, client *api.Client, secret *KvSecret) ([]*KvSecret, error) {
+	logger := plugin.Logger(ctx)
+
+	var secrets []*KvSecret
+	uri := fmt.Sprintf("/%smetadata/%s%s", secret.Mount, secret.Path, secret.Name)
+	logger.Debug("vault_kv_secret: listPathSecrets", "uri", uri)
+	data, err := client.Logical().List(uri)
 	for _, k := range getSecretAsStrings(data) {
-		fullPath := replaceDoubleSlash(fmt.Sprintf("%s/%s", keyPath, k))
-		secrets = append(secrets, fullPath)
+		secrets = append(secrets, &KvSecret{Mount: secret.Mount, Path: fmt.Sprintf("%s%s", secret.Path, secret.Name), Name: k})
 	}
 	return secrets, err
 }
@@ -99,18 +113,24 @@ func listPathSecrets(ctx context.Context, client *api.Client, engine string, key
 // Folders are identified by a trailing slash. Non trailing slash entries are individual secrets
 // foldersChan is the channel that will be used to receive paths to still explore from. This is fed by this function as well as the listSecrets one
 // secretsChan is the channel that will be used to output received secret metadata, which is the data we're actually interested in
-func listKvSecrets(ctx context.Context, client *api.Client, foldersChan chan SecretPath, secretsChan chan *KvSecret, wg *sync.WaitGroup) {
+func listKvSecrets(ctx context.Context, client *api.Client, foldersChan chan *KvSecret, secretsChan chan *KvSecret, wg *sync.WaitGroup) {
+	logger := plugin.Logger(ctx)
+
 	for k := range foldersChan {
-		if strings.HasSuffix(k.Path, "/") {
-			pathSecrets, _ := listPathSecrets(ctx, client, k.Engine, k.Path)
+		logger.Debug("vault_kv_secret: listKvSecrets", "k", fmt.Sprintf("%#v", k))
+		// time.Sleep(time.Second)
+
+		if k.Name == "" || strings.HasSuffix(k.Name, "/") {
+			pathSecrets, _ := listPathSecrets(ctx, client, k)
+			logger.Debug("vault_kv_secret: listKvSecrets", "pathSecrets", fmt.Sprintf("%#v", pathSecrets))
 
 			// We use the waitgroup as a counter. Once we've had as many wg.Done() calls as wg.Add, we've processed all trees
 			wg.Add(len(pathSecrets))
 			for _, p := range pathSecrets {
-				foldersChan <- SecretPath{Engine: k.Engine, Path: p}
+				foldersChan <- p
 			}
 		} else {
-			secret, err := getSecretMetadata(ctx, client, k.Engine, k.Path)
+			secret, err := getSecretMetadata(ctx, client, k)
 			if err == nil {
 				secretsChan <- secret
 			}
@@ -120,13 +140,15 @@ func listKvSecrets(ctx context.Context, client *api.Client, foldersChan chan Sec
 }
 
 // The function called by steampipe to populate the table. Will recursively fetch all secrets
-func listSecrets(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listSecrets(ctx context.Context, d *plugin.QueryData, hd *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
 	// used to determine when we've explored all paths
 	var wg sync.WaitGroup
 
 	// Fairly large buffers. Because foldersChan is self feeding with recursive paths, it could deadlock if there isn't
 	// enough space to actually contain the paths left to explore
-	foldersChan := make(chan SecretPath, 50000)
+	foldersChan := make(chan *KvSecret, 50000)
 	secretsChan := make(chan *KvSecret, 50000)
 
 	conn, err := connect(ctx, d)
@@ -134,23 +156,35 @@ func listSecrets(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 		return nil, err
 	}
 
+	quals := d.EqualsQuals
+	path := quals["path"].GetStringValue()
+	logger.Debug("vault_kv_secret: listSecrets", "path", path)
+
+	mount := quals["mount"].GetStringValue()
+	logger.Debug("vault_kv_secret: listSecrets", "mount", mount)
+
 	// Queue up the mounts to explore
 	allMounts, err := conn.Sys().ListMounts()
 	if err != nil {
 		return nil, err
 	}
+	logger.Debug("vault_kv_secret: listSecrets", "allMounts", fmt.Sprintf("%#v", allMounts))
 
 	mounts := filterMounts(allMounts, "kv")
-	for path := range mounts {
-		foldersChan <- SecretPath{Engine: path, Path: "/"}
-		wg.Add(1)
+	logger.Debug("vault_kv_secret: listSecrets", "mounts", fmt.Sprintf("%#v", mounts))
+	for m := range mounts {
+		logger.Debug("vault_kv_secret: listSecrets", "m", m)
+		if mount == "" || mount == m {
+			foldersChan <- &KvSecret{Mount: m, Path: path}
+			wg.Add(1)
+		}
 	}
 
 	// Workers for parallel requests
 	go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
-	go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
-	go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
-	go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
+	// go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
+	// go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
+	// go listKvSecrets(ctx, conn, foldersChan, secretsChan, &wg)
 
 	// Wait for the waitgroup to be done, once the waitgroup is done we'll have explored all paths and can close the channels
 	// This makes the goroutines and stream loop below terminate
@@ -170,6 +204,8 @@ func listSecrets(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 
 // Fetches a single secret, essentially just a check whether it exists.
 func getSecret(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	logger := plugin.Logger(ctx)
+
 	conn, err := connect(ctx, d)
 
 	if err != nil {
@@ -177,10 +213,19 @@ func getSecret(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 	}
 
 	quals := d.EqualsQuals
-	keyPath := quals["key"].GetStringValue()
-	mountpoint := quals["path"].GetStringValue()
+	name := quals["name"].GetStringValue()
+	path := quals["path"].GetStringValue()
+	mount := quals["mount"].GetStringValue()
 
-	data, err := getSecretMetadata(ctx, conn, mountpoint, keyPath)
+	logger.Debug("vault_kv_secret: getSecret", "mount", mount)
+	logger.Debug("vault_kv_secret: getSecret", "path", path)
+	logger.Debug("vault_kv_secret: getSecret", "name", name)
+	secret := KvSecret{
+		Mount: mount,
+		Path:  path,
+		Name:  name,
+	}
+	data, err := getSecretMetadata(ctx, conn, &secret)
 
 	if err != nil {
 		return nil, err
