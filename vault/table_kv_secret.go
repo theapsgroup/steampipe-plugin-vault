@@ -34,14 +34,8 @@ func tableKvSecret() *plugin.Table {
 		Description: "Vault kv secret keys",
 		List: &plugin.ListConfig{
 			KeyColumns: []*plugin.KeyColumn{
-				{
-					Name:    "mount",
-					Require: plugin.Optional,
-				},
-				{
-					Name:    "path",
-					Require: plugin.Required,
-				},
+				{Name: "mount", Require: plugin.Optional, Operators: []string{"=", "~~"}},
+				{Name: "path", Require: plugin.Optional, Operators: []string{"=", "~~"}},
 			},
 			Hydrate: listSecrets,
 		},
@@ -156,13 +150,6 @@ func listSecrets(ctx context.Context, d *plugin.QueryData, hd *plugin.HydrateDat
 		return nil, err
 	}
 
-	quals := d.EqualsQuals
-	path := quals["path"].GetStringValue()
-	logger.Debug("vault_kv_secret: listSecrets", "path", path)
-
-	mount := quals["mount"].GetStringValue()
-	logger.Debug("vault_kv_secret: listSecrets", "mount", mount)
-
 	// Queue up the mounts to explore
 	allMounts, err := conn.Sys().ListMounts()
 	if err != nil {
@@ -170,11 +157,20 @@ func listSecrets(ctx context.Context, d *plugin.QueryData, hd *plugin.HydrateDat
 	}
 	logger.Debug("vault_kv_secret: listSecrets", "allMounts", fmt.Sprintf("%#v", allMounts))
 
-	mounts := filterMounts(allMounts, "kv")
+	mounts := filterMounts(ctx, allMounts, "kv", d.Quals)
 	logger.Debug("vault_kv_secret: listSecrets", "mounts", fmt.Sprintf("%#v", mounts))
 	for m := range mounts {
 		logger.Debug("vault_kv_secret: listSecrets", "m", m)
-		if mount == "" || mount == m {
+		for _, pathQual := range d.Quals["path"].Quals {
+			logger.Debug("vault_kv_secret: listSecrets", "pathQual", pathQual)
+
+			path := pathQual.Value.GetStringValue()
+			switch pathQual.Operator {
+			case "=":
+			case "~~":
+				path, _, _ = strings.Cut(pathQual.Value.GetStringValue(), "%")
+			}
+
 			foldersChan <- &KvSecret{Mount: m, Path: path}
 			wg.Add(1)
 		}

@@ -49,7 +49,7 @@ func listCerts(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		return nil, err
 	}
 
-	mounts := filterMounts(allMounts, "pki")
+	mounts := filterMounts(ctx, allMounts, "pki", d.Quals)
 	for mount := range mounts {
 		certs, err := getCertDetails(ctx, conn, mount)
 		if err != nil {

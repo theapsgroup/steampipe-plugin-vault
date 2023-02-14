@@ -63,7 +63,7 @@ func listRoles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) 
 		return nil, err
 	}
 
-	mounts := filterMounts(allMounts, "aws")
+	mounts := filterMounts(ctx, allMounts, "aws", d.Quals)
 	for mount := range mounts {
 		roles, err := listAwsRoles(conn, mount)
 		if err != nil {

@@ -70,7 +70,7 @@ func listPkiRoles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDat
 		return nil, err
 	}
 
-	mounts := filterMounts(allMounts, "pki")
+	mounts := filterMounts(ctx, allMounts, "pki", d.Quals)
 	for mount := range mounts {
 		roles, err := getPkiRoleDetails(ctx, conn, mount)
 		if err != nil {
