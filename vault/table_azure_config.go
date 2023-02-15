@@ -3,6 +3,7 @@ package vault
 import (
 	"context"
 	"fmt"
+
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -43,7 +44,7 @@ func listAzureConfigs(ctx context.Context, d *plugin.QueryData, h *plugin.Hydrat
 		return nil, err
 	}
 
-	mounts := filterMounts(allMounts, "azure")
+	mounts := filterMounts(ctx, allMounts, "azure", d.Quals)
 	for path := range mounts {
 		config, err := conn.Logical().Read(replaceDoubleSlash(fmt.Sprintf("/%s/config", path)))
 		if err != nil {

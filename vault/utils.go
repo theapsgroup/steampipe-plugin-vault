@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -73,12 +74,33 @@ func replaceDoubleSlash(url string) string {
 }
 
 // Util func to obtain filtered mounts from all mounts
-func filterMounts(in map[string]*api.MountOutput, mountType string) map[string]*api.MountOutput {
-	filtered := map[string]*api.MountOutput{}
+func filterMounts(ctx context.Context, in map[string]*api.MountOutput, mountType string, quals plugin.KeyColumnQualMap) map[string]*api.MountOutput {
+	logger := plugin.Logger(ctx)
 
-	for key, mount := range in {
-		if mount.Type == mountType {
-			filtered[key] = mount
+	filtered := map[string]*api.MountOutput{}
+	for _, mountQual := range quals["mount"].Quals {
+		logger.Debug("vault_kv_secret: filterMounts", "mountQual", mountQual)
+
+		for key, mount := range in {
+			if mount.Type == mountType {
+				switch mountQual.Operator {
+				case "=":
+					if key == mountQual.Value.GetStringValue() {
+						filtered[key] = mount
+					}
+				case "~~":
+					regex := strings.ReplaceAll(mountQual.Value.GetStringValue(), "%", ".*")
+					regex = strings.ReplaceAll(regex, "_", ".")
+					r, err := regexp.Compile(regex)
+					if err != nil {
+						logger.Warn("vault_kv_secret: filterMounts", "failed_regex", regex)
+						continue
+					}
+					if r.MatchString(key) {
+						filtered[key] = mount
+					}
+				}
+			}
 		}
 	}
 

@@ -3,6 +3,7 @@ package vault
 import (
 	"context"
 	"fmt"
+
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -37,7 +38,7 @@ func listAzureRoles(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateD
 		return nil, err
 	}
 
-	mounts := filterMounts(allMounts, "azure")
+	mounts := filterMounts(ctx, allMounts, "azure", d.Quals)
 	for path := range mounts {
 		data, err := conn.Logical().List(replaceDoubleSlash(fmt.Sprintf("/%s/roles", path)))
 		if err != nil {
